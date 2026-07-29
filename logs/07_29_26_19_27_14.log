@@ -1,0 +1,5 @@
+[ 2026-07-29 19:27:14,826 ] 22 root - INFO - Logging has started.
+[ 2026-07-29 19:27:15,228 ] 32 root - INFO - MongoDB connection established successfully.
+[ 2026-07-29 19:27:15,228 ] 42 root - INFO - Reading CSV file: D:\MLOPS\Projects\NETWORK_SECURITY\Network_Data\phisingData.csv
+[ 2026-07-29 19:27:15,428 ] 50 root - INFO - Successfully converted 11055 records to JSON.
+[ 2026-07-29 19:27:27,809 ] 67 root - INFO - Inserted 11055 records into 'AMRITAI.NetworkData'.
