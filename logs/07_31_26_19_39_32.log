@@ -1,0 +1,34 @@
+[ 2026-07-31 19:39:32,246 ] 22 root - INFO - Logging has started.
+[ 2026-07-31 19:39:32,330 ] 18 root - INFO - ============================================================
+[ 2026-07-31 19:39:32,330 ] 19 root - INFO - Starting Network Security Training Pipeline
+[ 2026-07-31 19:39:32,330 ] 20 root - INFO - ============================================================
+[ 2026-07-31 19:39:32,852 ] 44 root - INFO - MongoDB connection established successfully.
+[ 2026-07-31 19:39:32,852 ] 38 root - INFO - Starting Data Ingestion...
+[ 2026-07-31 19:39:32,852 ] 183 root - INFO - ============================================================
+[ 2026-07-31 19:39:32,853 ] 184 root - INFO - Starting Data Ingestion Pipeline
+[ 2026-07-31 19:39:32,853 ] 185 root - INFO - ============================================================
+[ 2026-07-31 19:39:32,853 ] 54 root - INFO - Exporting collection from MongoDB.
+[ 2026-07-31 19:39:33,580 ] 77 root - ERROR - Pipeline execution failed.
+Traceback (most recent call last):
+  File "D:\MLOPS\Projects\NETWORK_SECURITY\networksecurity\components\data_ingestion.py", line 67, in export_collection_as_dataframe
+    raise Exception("MongoDB collection is empty.")
+Exception: MongoDB collection is empty.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MLOPS\Projects\NETWORK_SECURITY\networksecurity\components\data_ingestion.py", line 187, in initiate_data_ingestion
+    dataframe = self.export_collection_as_dataframe()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\MLOPS\Projects\NETWORK_SECURITY\networksecurity\components\data_ingestion.py", line 92, in export_collection_as_dataframe
+    raise NetworkSecurityException(e, sys)
+networksecurity.exception.exception.NetworkSecurityException: Error occurred in python script name [D:\MLOPS\Projects\NETWORK_SECURITY\networksecurity\components\data_ingestion.py] line number [67] error message [MongoDB collection is empty.]
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MLOPS\Projects\NETWORK_SECURITY\main.py", line 41, in main
+    data_ingestion.initiate_data_ingestion()
+  File "D:\MLOPS\Projects\NETWORK_SECURITY\networksecurity\components\data_ingestion.py", line 203, in initiate_data_ingestion
+    raise NetworkSecurityException(e, sys)
+networksecurity.exception.exception.NetworkSecurityException: Error occurred in python script name [D:\MLOPS\Projects\NETWORK_SECURITY\networksecurity\components\data_ingestion.py] line number [187] error message [Error occurred in python script name [D:\MLOPS\Projects\NETWORK_SECURITY\networksecurity\components\data_ingestion.py] line number [67] error message [MongoDB collection is empty.]]

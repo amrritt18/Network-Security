@@ -1,0 +1,54 @@
+[ 2026-07-31 20:57:47,439 ] 22 root - INFO - Logging has started.
+[ 2026-07-31 20:57:47,474 ] 18 root - INFO - ============================================================
+[ 2026-07-31 20:57:47,474 ] 19 root - INFO - Starting Network Security Training Pipeline
+[ 2026-07-31 20:57:47,474 ] 20 root - INFO - ============================================================
+[ 2026-07-31 20:57:47,818 ] 44 root - INFO - MongoDB connection established successfully.
+[ 2026-07-31 20:57:47,818 ] 38 root - INFO - Starting Data Ingestion...
+[ 2026-07-31 20:57:47,820 ] 183 root - INFO - ============================================================
+[ 2026-07-31 20:57:47,820 ] 184 root - INFO - Starting Data Ingestion Pipeline
+[ 2026-07-31 20:57:47,832 ] 185 root - INFO - ============================================================
+[ 2026-07-31 20:57:47,832 ] 54 root - INFO - Exporting collection from MongoDB.
+[ 2026-07-31 20:57:49,899 ] 85 root - INFO - Successfully fetched 11055 records from MongoDB.
+[ 2026-07-31 20:57:49,997 ] 117 root - INFO - Feature Store created at: artifacts\07_31_2026_20_57_47\data_ingestion\feature_store\phisingData.csv
+[ 2026-07-31 20:57:49,997 ] 134 root - INFO - Performing Train-Test Split.
+[ 2026-07-31 20:57:50,071 ] 167 root - INFO - Training data saved at: artifacts\07_31_2026_20_57_47\data_ingestion\ingested\train.csv
+[ 2026-07-31 20:57:50,071 ] 171 root - INFO - Testing data saved at: artifacts\07_31_2026_20_57_47\data_ingestion\ingested\test.csv
+[ 2026-07-31 20:57:50,072 ] 198 root - INFO - Data Ingestion Completed Successfully.
+[ 2026-07-31 20:57:50,072 ] 44 root - INFO - Data Ingestion Completed Successfully.
+[ 2026-07-31 20:57:50,073 ] 50 root - INFO - Initializing Data Validation Component.
+[ 2026-07-31 20:57:50,077 ] 59 root - INFO - Schema loaded successfully.
+[ 2026-07-31 20:57:50,077 ] 61 root - INFO - Starting Data Validation...
+[ 2026-07-31 20:57:50,077 ] 561 root - INFO - ======================================================================
+[ 2026-07-31 20:57:50,077 ] 562 root - INFO - Starting Data Validation Pipeline
+[ 2026-07-31 20:57:50,077 ] 563 root - INFO - ======================================================================
+[ 2026-07-31 20:57:50,077 ] 80 root - INFO - Reading dataset : artifacts\07_31_2026_20_57_47\data_ingestion\ingested\train.csv
+[ 2026-07-31 20:57:50,117 ] 84 root - INFO - Dataset Shape : (8844, 31)
+[ 2026-07-31 20:57:50,117 ] 80 root - INFO - Reading dataset : artifacts\07_31_2026_20_57_47\data_ingestion\ingested\test.csv
+[ 2026-07-31 20:57:50,164 ] 84 root - INFO - Dataset Shape : (2211, 31)
+[ 2026-07-31 20:57:50,164 ] 497 root - INFO - Train Shape : (8844, 31)
+[ 2026-07-31 20:57:50,164 ] 501 root - INFO - Test Shape : (2211, 31)
+[ 2026-07-31 20:57:50,164 ] 77 root - ERROR - Pipeline execution failed.
+Traceback (most recent call last):
+  File "D:\MLOPS\Projects\NETWORK_SECURITY\networksecurity\components\data_validation.py", line 116, in validate_schema
+    expected_columns.extend(col.keys())
+                            ^^^^^^^^
+AttributeError: 'str' object has no attribute 'keys'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MLOPS\Projects\NETWORK_SECURITY\networksecurity\components\data_validation.py", line 590, in initiate_data_validation
+    if not self.validate_schema(train_df):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\MLOPS\Projects\NETWORK_SECURITY\networksecurity\components\data_validation.py", line 163, in validate_schema
+    raise NetworkSecurityException(e, sys)
+networksecurity.exception.exception.NetworkSecurityException: Error occurred in python script name [D:\MLOPS\Projects\NETWORK_SECURITY\networksecurity\components\data_validation.py] line number [116] error message ['str' object has no attribute 'keys']
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MLOPS\Projects\NETWORK_SECURITY\main.py", line 64, in main
+    data_validation.initiate_data_validation()
+  File "D:\MLOPS\Projects\NETWORK_SECURITY\networksecurity\components\data_validation.py", line 791, in initiate_data_validation
+    raise NetworkSecurityException(e, sys)
+networksecurity.exception.exception.NetworkSecurityException: Error occurred in python script name [D:\MLOPS\Projects\NETWORK_SECURITY\networksecurity\components\data_validation.py] line number [590] error message [Error occurred in python script name [D:\MLOPS\Projects\NETWORK_SECURITY\networksecurity\components\data_validation.py] line number [116] error message ['str' object has no attribute 'keys']]
