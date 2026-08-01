@@ -130,15 +130,17 @@ def evaluate_models(
     y_test,
     models: Dict,
     params: Dict,
-) -> Dict[str, float]:
+):
     """
-    Perform GridSearchCV for multiple models
-    and return test accuracy.
+    Train multiple models using GridSearchCV and return:
+        1. Model performance report
+        2. Best trained models
     """
 
     try:
 
         report = {}
+        trained_models = {}
 
         for model_name, model in models.items():
 
@@ -157,6 +159,8 @@ def evaluate_models(
             grid_search.fit(X_train, y_train)
 
             best_model = grid_search.best_estimator_
+
+            trained_models[model_name] = best_model
 
             train_predictions = best_model.predict(X_train)
             test_predictions = best_model.predict(X_test)
@@ -179,7 +183,7 @@ def evaluate_models(
 
             report[model_name] = test_score
 
-        return report
+        return report, trained_models
 
     except Exception as e:
         raise NetworkSecurityException(e, sys)
