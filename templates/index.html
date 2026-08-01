@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Network Security Detection System
+    </title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 500px;
+            margin: 100px auto;
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        .upload-box {
+            border: 2px dashed #999;
+            padding: 30px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+        }
+
+        input[type="file"] {
+            margin: 10px;
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            background-color: #222;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #444;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>
+            Network Security Detection System
+        </h1>
+
+        <p>
+            Machine Learning Based Phishing Website Detection
+        </p>
+
+        <form
+            action="/predict"
+            method="post"
+            enctype="multipart/form-data"
+        >
+
+            <div class="upload-box">
+
+                <h3>
+                    Upload Dataset
+                </h3>
+
+                <p>
+                    Select a CSV file for prediction
+                </p>
+
+                <input
+                    type="file"
+                    name="file"
+                    accept=".csv"
+                    required
+                >
+
+            </div>
+
+            <button type="submit">
+                Analyze Dataset
+            </button>
+
+        </form>
+
+    </div>
+
+</body>
+
+</html>
