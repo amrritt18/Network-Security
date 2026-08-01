@@ -131,48 +131,54 @@ def evaluate_models(
     models: Dict,
     params: Dict,
 ):
-    """
-    Train multiple models using GridSearchCV and return:
-        1. Model performance report
-        2. Best trained models
-    """
-
     try:
-
         report = {}
         trained_models = {}
 
         for model_name, model in models.items():
 
-            logging.info(f"Training {model_name}")
+            logging.info(
+                f"Training model: {model_name}"
+            )
 
-            param_grid = params.get(model_name, {})
+            param_grid = params.get(
+                model_name,
+                {}
+            )
 
             grid_search = GridSearchCV(
                 estimator=model,
                 param_grid=param_grid,
                 cv=3,
                 n_jobs=-1,
-                verbose=0,
+                scoring="accuracy",
             )
 
-            grid_search.fit(X_train, y_train)
+            grid_search.fit(
+                X_train,
+                y_train
+            )
 
-            best_model = grid_search.best_estimator_
+            best_model = (
+                grid_search.best_estimator_
+            )
 
-            trained_models[model_name] = best_model
+            y_train_pred = best_model.predict(
+                X_train
+            )
 
-            train_predictions = best_model.predict(X_train)
-            test_predictions = best_model.predict(X_test)
+            y_test_pred = best_model.predict(
+                X_test
+            )
 
             train_score = accuracy_score(
                 y_train,
-                train_predictions,
+                y_train_pred
             )
 
             test_score = accuracy_score(
                 y_test,
-                test_predictions,
+                y_test_pred
             )
 
             logging.info(
@@ -181,9 +187,21 @@ def evaluate_models(
                 f"Test Accuracy: {test_score:.4f}"
             )
 
+            logging.info(
+                f"{model_name} Best Parameters: "
+                f"{grid_search.best_params_}"
+            )
+
             report[model_name] = test_score
+
+            trained_models[model_name] = (
+                best_model
+            )
 
         return report, trained_models
 
     except Exception as e:
-        raise NetworkSecurityException(e, sys)
+        raise NetworkSecurityException(
+            e,
+            sys
+        )

@@ -51,19 +51,28 @@ MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI")
 MLFLOW_TRACKING_USERNAME = os.getenv("MLFLOW_TRACKING_USERNAME")
 MLFLOW_TRACKING_PASSWORD = os.getenv("MLFLOW_TRACKING_PASSWORD")
 
-if MLFLOW_TRACKING_URI:
-    os.environ["MLFLOW_TRACKING_URI"] = MLFLOW_TRACKING_URI
-
-if MLFLOW_TRACKING_USERNAME:
-    os.environ["MLFLOW_TRACKING_USERNAME"] = (
-        MLFLOW_TRACKING_USERNAME
+if not MLFLOW_TRACKING_URI:
+    raise ValueError(
+        "MLFLOW_TRACKING_URI is not configured."
     )
 
-if MLFLOW_TRACKING_PASSWORD:
-    os.environ["MLFLOW_TRACKING_PASSWORD"] = (
-        MLFLOW_TRACKING_PASSWORD
+if not MLFLOW_TRACKING_USERNAME:
+    raise ValueError(
+        "MLFLOW_TRACKING_USERNAME is not configured."
     )
 
+if not MLFLOW_TRACKING_PASSWORD:
+    raise ValueError(
+        "MLFLOW_TRACKING_PASSWORD is not configured."
+    )
+
+mlflow.set_tracking_uri(
+    MLFLOW_TRACKING_URI
+)
+
+mlflow.set_experiment(
+    "Network-Security-Training"
+)
 
 class ModelTrainer:
     """
@@ -107,60 +116,55 @@ class ModelTrainer:
         self,
         model,
         classification_metric,
-    ) -> None:
-        """
-        Log model and metrics to MLflow.
-        """
-
+        model_name,
+    ):
         try:
-
-            mlflow.set_tracking_uri(
-                os.getenv("MLFLOW_TRACKING_URI")
+            logging.info(
+                f"Starting MLflow tracking for {model_name}"
             )
-
-            tracking_url_type_store = urlparse(
-                mlflow.get_tracking_uri()
-            ).scheme
 
             with mlflow.start_run():
 
+                # Model name
+                mlflow.log_param(
+                    "model_name",
+                    model_name
+                )
+
+                # Model hyperparameters
+                mlflow.log_params(
+                    model.get_params()
+                )
+
+                # Model metrics
                 mlflow.log_metric(
                     "accuracy",
-                    classification_metric.accuracy_score,
+                    classification_metric.accuracy_score
+                )
+
+                mlflow.log_metric(
+                    "precision",
+                    classification_metric.precision_score
+                )
+
+                mlflow.log_metric(
+                    "recall",
+                    classification_metric.recall_score
                 )
 
                 mlflow.log_metric(
                     "f1_score",
-                    classification_metric.f1_score,
+                    classification_metric.f1_score
                 )
 
-                mlflow.log_metric(
-                    "precision_score",
-                    classification_metric.precision_score,
+                # Save model to MLflow
+                mlflow.sklearn.log_model(
+                    sk_model=model,
+                    name="model"
                 )
-
-                mlflow.log_metric(
-                    "recall_score",
-                    classification_metric.recall_score,
-                )
-
-                if tracking_url_type_store != "file":
-
-                    mlflow.sklearn.log_model(
-                        sk_model=model,
-                        name="model",
-                        registered_model_name=model.__class__.__name__,
-                    )
-
-                else:
-
-                    mlflow.sklearn.log_model(
-                        sk_model=model,
-                        name="model",
-                    )
 
                 logging.info(
-                    "MLflow tracking completed successfully."
+                    f"MLflow tracking completed for {model_name}"
                 )
 
         except Exception as e:
@@ -276,7 +280,6 @@ class ModelTrainer:
                 models=models,
                 params=params,
             )
-
             logging.info(
                 f"Model Report : {model_report}"
             )
@@ -293,7 +296,6 @@ class ModelTrainer:
             best_model = trained_models[
                 best_model_name
             ]
-
             logging.info(
                 f"Best Model : {best_model_name}"
             )
@@ -366,8 +368,9 @@ class ModelTrainer:
             )
 
             self.track_mlflow(
-                best_model,
-                test_metric,
+                model=best_model,
+                classification_metric=test_metric,
+                model_name=best_model_name,
             )
 
             logging.info(

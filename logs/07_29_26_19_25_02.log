@@ -1,3 +1,0 @@
-[ 2026-07-29 19:25:02,895 ] 22 root - INFO - Logging has started.
-[ 2026-07-29 19:25:03,310 ] 32 root - INFO - MongoDB connection established successfully.
-[ 2026-07-29 19:25:03,311 ] 42 root - INFO - Reading CSV file: NETWORK_SECURITY\Network_Data\phisingData.csv
