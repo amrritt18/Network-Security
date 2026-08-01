@@ -1,2 +1,38 @@
-.venv
+# Virtual environment
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment variables / secrets
 .env
+
+# MLflow local files
+mlruns/
+mlartifacts/
+mlflow.db
+
+# Training pipeline generated artifacts
+artifacts/
+Artifacts/
+
+# Trained models
+final_model/
+saved_models/
+*.pkl
+*.joblib
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

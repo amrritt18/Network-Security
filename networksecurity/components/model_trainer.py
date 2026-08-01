@@ -148,7 +148,7 @@ class ModelTrainer:
 
                     mlflow.sklearn.log_model(
                         sk_model=model,
-                        artifact_path="model",
+                        name="model",
                         registered_model_name=model.__class__.__name__,
                     )
 
@@ -156,7 +156,7 @@ class ModelTrainer:
 
                     mlflow.sklearn.log_model(
                         sk_model=model,
-                        artifact_path="model",
+                        name="model",
                     )
 
                 logging.info(
@@ -166,13 +166,13 @@ class ModelTrainer:
         except Exception as e:
             raise NetworkSecurityException(e, sys)
 
-        def train_model(
-                self,
-                X_train,
-                y_train,
-                X_test,
-                y_test,
-            ) -> ModelTrainerArtifact:
+    def train_model(
+            self,
+            X_train,
+            y_train,
+            X_test,
+            y_test,
+        ) -> ModelTrainerArtifact:
 
         try:
 
@@ -268,18 +268,12 @@ class ModelTrainer:
                 "Evaluating all machine learning models."
             )
 
-            model_report = evaluate_models(
-
+            model_report, trained_models = evaluate_models(
                 X_train=X_train,
-
                 y_train=y_train,
-
                 X_test=X_test,
-
                 y_test=y_test,
-
                 models=models,
-
                 params=params,
             )
 
@@ -287,16 +281,16 @@ class ModelTrainer:
                 f"Model Report : {model_report}"
             )
 
-            best_model_score = max(
-                model_report.values()
-            )
-
             best_model_name = max(
                 model_report,
                 key=model_report.get,
             )
 
-            best_model = models[
+            best_model_score = model_report[
+                best_model_name
+            ]
+
+            best_model = trained_models[
                 best_model_name
             ]
 
@@ -316,15 +310,6 @@ class ModelTrainer:
                 raise Exception(
                     "No suitable model found."
                 )
-
-            logging.info(
-                "Training best model on complete training dataset."
-            )
-
-            best_model.fit(
-                X_train,
-                y_train,
-            )
 
             y_train_pred = best_model.predict(
                 X_train
