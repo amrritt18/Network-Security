@@ -2,86 +2,94 @@
 
 ## Machine Learning Based Phishing Website Detection
 
-An end-to-end Machine Learning application for detecting **phishing websites** from website and URL-related security features.
+An end-to-end Machine Learning application for detecting **phishing websites** using website and URL-related security characteristics.
 
-The project implements a complete ML workflow including **data ingestion, data validation, data drift detection, data transformation, model training, model evaluation, prediction, and web-based deployment using FastAPI**.
+The project implements a complete Machine Learning workflow including:
 
-The trained model is integrated with a simple web interface where users can upload a CSV dataset and receive phishing detection results.
+- Data Ingestion
+- Data Validation
+- Data Drift Detection
+- Data Transformation
+- Model Training
+- Hyperparameter Tuning
+- Model Evaluation
+- Model Serialization
+- MongoDB Integration
+- FastAPI Model Serving
+- CSV-Based Batch Prediction
+- Direct Website URL Prediction
+- Web-Based User Interface
+
+The application supports two prediction modes:
+
+1. **CSV Prediction** — Upload a dataset containing the required website security features.
+2. **URL Prediction** — Enter a website URL and automatically extract 30 phishing-related features before performing prediction.
 
 ---
 
-## 📌 Project Overview
+# 📌 Project Overview
 
-Phishing websites are designed to imitate legitimate websites in order to steal sensitive information such as usernames, passwords, banking information, and other credentials.
+Phishing websites are malicious websites designed to imitate legitimate services and trick users into providing sensitive information such as:
 
-This project uses Machine Learning to analyze characteristics of websites and classify them based on their phishing-related behavior.
+- Usernames
+- Passwords
+- Banking information
+- Personal information
+- Login credentials
 
-The complete workflow is:
+This project uses Machine Learning to analyze website characteristics and classify websites as:
 
 ```text
-Dataset / MongoDB
-        ↓
-Data Ingestion
-        ↓
-Data Validation
-        ↓
-Data Drift Detection
-        ↓
-Data Transformation
-        ↓
-Model Training
-        ↓
-Model Evaluation
-        ↓
-Best Model Selection
-        ↓
-Model Serialization
-        ↓
-FastAPI Application
-        ↓
-CSV Upload
-        ↓
-Phishing Prediction
-        ↓
-Web-Based Results
+Legitimate
+or
+Phishing
 ```
+
+The system is designed using a modular Machine Learning architecture rather than keeping the complete workflow inside a single notebook.
 
 ---
 
-## 🎯 Project Objectives
+# 🎯 Project Objectives
 
 The major objectives of this project are:
 
 - Build an end-to-end Machine Learning pipeline
-- Detect phishing websites using website security features
+- Detect phishing websites using security-related features
 - Automate data ingestion and preprocessing
 - Validate incoming datasets before model training
 - Detect data drift between training and testing datasets
 - Train and compare multiple classification algorithms
+- Perform hyperparameter tuning
 - Automatically select the best-performing model
-- Save the preprocessing pipeline and trained model
+- Save the trained model and preprocessing pipeline
 - Build a prediction API using FastAPI
-- Provide a user-friendly web interface for predictions
+- Support CSV-based batch prediction
+- Support direct website URL prediction
+- Automatically extract URL and webpage security features
+- Provide a simple browser-based prediction interface
 - Maintain a modular and scalable project structure
 
 ---
 
-## ✨ Key Features
+# ✨ Key Features
 
-### Data Ingestion
+## 📥 Data Ingestion
 
-The Data Ingestion component retrieves the dataset and prepares training and testing datasets.
+The Data Ingestion component retrieves the source dataset and prepares the data for the Machine Learning pipeline.
 
 Responsibilities include:
 
-- Loading source data
-- Converting data into Pandas DataFrames
-- Creating training and testing datasets
+- Connecting to the data source
+- Loading the phishing dataset
+- Converting records into Pandas DataFrames
+- Splitting data into training and testing datasets
 - Saving generated datasets as pipeline artifacts
+
+MongoDB is used as part of the project's data ingestion infrastructure.
 
 ---
 
-### Data Validation
+# ✅ Data Validation
 
 Before training, the dataset passes through a dedicated validation stage.
 
@@ -96,19 +104,19 @@ The validation pipeline checks:
 - Numerical columns
 - Train/test compatibility
 
-This prevents invalid data from silently entering the training pipeline.
+This prevents invalid or unexpected data from silently entering the training pipeline.
 
 ---
 
-### Data Drift Detection
+# 📊 Data Drift Detection
 
 The project performs statistical data drift detection using the:
 
 **Kolmogorov-Smirnov (KS) Two-Sample Test**
 
-For every feature, the distributions of training and testing data are compared.
+The distributions of training and testing features are compared to identify significant differences.
 
-A drift report is generated containing information such as:
+A drift report can contain information such as:
 
 ```yaml
 URL_Length:
@@ -118,11 +126,11 @@ URL_Length:
   threshold: 0.05
 ```
 
-The drift report is stored as a YAML artifact.
+The generated drift report is stored as a YAML artifact.
 
 ---
 
-## 🔄 Data Transformation
+# 🔄 Data Transformation
 
 The transformation pipeline prepares validated data for Machine Learning.
 
@@ -141,19 +149,40 @@ The transformation stage:
 - Fits preprocessing only on training data
 - Transforms training data
 - Transforms testing data
-- Converts the target labels for classification
-- Saves transformed arrays
+- Converts target labels for binary classification
+- Saves transformed NumPy arrays
 - Saves the fitted preprocessing object
 
-The transformed datasets are stored as NumPy arrays.
+## Target Transformation
+
+The original dataset contains:
+
+```text
+Result = 1
+Result = -1
+```
+
+For model training:
+
+```text
+-1 → 0
+ 1 → 1
+```
+
+Therefore, the final model classes are interpreted as:
+
+```text
+0 → Phishing
+1 → Legitimate
+```
 
 ---
 
-## 🤖 Machine Learning Models
+# 🤖 Machine Learning Models
 
-Multiple classification algorithms are evaluated during model training.
+Multiple classification algorithms are evaluated during training.
 
-The current project includes:
+The project includes:
 
 - Random Forest Classifier
 - Decision Tree Classifier
@@ -171,9 +200,9 @@ The pipeline evaluates candidate models and automatically selects the best-perfo
 
 ---
 
-## 📊 Model Evaluation
+# 📈 Model Evaluation
 
-The model is evaluated using multiple classification metrics:
+The trained models are evaluated using:
 
 - Accuracy
 - Precision
@@ -189,23 +218,33 @@ A successful training run produced approximately:
 | Recall | 99.53% | 98.36% |
 | F1 Score | 99.15% | 97.29% |
 
-These results indicate strong classification performance while maintaining good generalization on the test dataset.
+These metrics correspond to evaluation on the prepared dataset/test pipeline.
+
+> **Important:** These test metrics should not automatically be interpreted as the accuracy of the experimental live-URL prediction mode. Live URL prediction generates features dynamically, and some reputation-oriented features require approximations or external information.
 
 ---
 
-## 🧠 Final Prediction Model
+# 🧠 Final Prediction Model
 
-The final prediction object combines:
+The final prediction object combines the preprocessing pipeline and trained classifier:
 
 ```text
+Raw Features
+      ↓
 Preprocessing Pipeline
-        +
+      ↓
 Trained Classification Model
-        ↓
+      ↓
+Prediction
+```
+
+The custom:
+
+```text
 NetworkModel
 ```
 
-The custom `NetworkModel` performs preprocessing and prediction through a single interface.
+provides a single prediction interface.
 
 Conceptually:
 
@@ -220,93 +259,334 @@ Raw Input
     ↓
 Preprocessor
     ↓
-Transformed Input
+Transformed Features
     ↓
 Trained Model
     ↓
 Prediction
 ```
 
-This helps keep training and inference preprocessing consistent.
+This helps maintain consistency between training and inference.
 
 ---
 
-## 🌐 FastAPI Web Application
+# 🌐 Prediction Modes
 
-The trained model is integrated into a FastAPI application.
+The application currently supports two prediction methods.
 
-The application provides a browser-based interface where a user can:
+## 1️⃣ CSV-Based Batch Prediction
 
-1. Open the application
-2. Upload a CSV file
-3. Submit the dataset for analysis
-4. Run predictions using the trained model
-5. View the prediction summary
-6. Inspect individual prediction results
+Users can upload a CSV file containing the required 30 website features.
+
+Workflow:
+
+```text
+CSV File
+    ↓
+FastAPI
+    ↓
+Pandas DataFrame
+    ↓
+NetworkModel
+    ↓
+Preprocessing
+    ↓
+ML Classifier
+    ↓
+Predictions
+    ↓
+Legitimate / Phishing
+    ↓
+Prediction Summary
+```
 
 The result page displays:
 
-- Total number of analyzed records
+- Total analyzed records
 - Number of legitimate predictions
 - Number of phishing predictions
-- Prediction percentages
+- Legitimate percentage
+- Phishing percentage
 - Detailed prediction table
+
+The prediction output is also saved as:
+
+```text
+prediction_output/output.csv
+```
 
 ---
 
-## 🔌 API Endpoints
+# 🔗 Direct Website URL Prediction
 
-### Home
+The application also includes an experimental direct URL prediction mode.
+
+Instead of manually creating a CSV file, the user can enter:
+
+```text
+https://www.example.com
+```
+
+The system automatically extracts the required features and sends them to the trained model.
+
+Workflow:
+
+```text
+Website URL
+      ↓
+URL Validation
+      ↓
+URL Feature Extractor
+      ↓
+30 Security Features
+      ↓
+NetworkModel
+      ↓
+Preprocessing
+      ↓
+ML Classifier
+      ↓
+Prediction
+      ↓
+Legitimate / Phishing
+```
+
+This allows the application to provide a much simpler user experience.
+
+---
+
+# 🔍 URL Feature Extraction
+
+The custom URL feature extractor analyzes multiple characteristics of the submitted website.
+
+The 30 model features are:
+
+```text
+1.  having_IP_Address
+2.  URL_Length
+3.  Shortining_Service
+4.  having_At_Symbol
+5.  double_slash_redirecting
+6.  Prefix_Suffix
+7.  having_Sub_Domain
+8.  SSLfinal_State
+9.  Domain_registeration_length
+10. Favicon
+11. port
+12. HTTPS_token
+13. Request_URL
+14. URL_of_Anchor
+15. Links_in_tags
+16. SFH
+17. Submitting_to_email
+18. Abnormal_URL
+19. Redirect
+20. on_mouseover
+21. RightClick
+22. popUpWidnow
+23. Iframe
+24. age_of_domain
+25. DNSRecord
+26. web_traffic
+27. Page_Rank
+28. Google_Index
+29. Links_pointing_to_page
+30. Statistical_report
+```
+
+Feature extraction uses information from:
+
+- URL structure
+- Domain information
+- DNS resolution
+- SSL/TLS information
+- WHOIS information
+- HTML content
+- Links and resources
+- Forms
+- JavaScript-related patterns
+- Redirect behavior
+
+---
+
+# ⚠️ Live URL Prediction Limitation
+
+The original phishing dataset contains several features that historically depend on external reputation, ranking, indexing, or backlink information.
+
+Examples include:
+
+```text
+web_traffic
+Page_Rank
+Google_Index
+Links_pointing_to_page
+Statistical_report
+```
+
+Some of these values cannot be reproduced exactly today using only a submitted URL.
+
+Therefore, the current URL feature extractor uses practical live approximations for some features.
+
+As a result:
+
+> **The URL prediction functionality should currently be considered an experimental/demo feature until it is separately validated on a labeled live-URL dataset.**
+
+The CSV-based model evaluation remains the validated prediction workflow for the reported test metrics.
+
+---
+
+# 🔐 URL Security Validation
+
+Because direct URL prediction requires the backend to retrieve information from a submitted URL, the FastAPI application performs URL validation before feature extraction.
+
+The application rejects targets such as:
+
+```text
+localhost
+127.0.0.1
+private network addresses
+loopback addresses
+link-local addresses
+reserved addresses
+```
+
+Only HTTP and HTTPS URLs are accepted.
+
+This provides basic protection against Server-Side Request Forgery (SSRF) attempts.
+
+---
+
+# 🌐 FastAPI Web Application
+
+The trained model is integrated into a FastAPI application.
+
+The browser interface provides two options:
+
+```text
+┌─────────────────────────────────────┐
+│ Network Security Detection System   │
+│                                     │
+│       Check Website URL             │
+│                                     │
+│ [ https://www.example.com        ]  │
+│                                     │
+│        [ Check Website ]            │
+│                                     │
+│                OR                   │
+│                                     │
+│         Upload Dataset              │
+│                                     │
+│          [ Choose File ]            │
+│                                     │
+│        [ Analyze Dataset ]          │
+└─────────────────────────────────────┘
+```
+
+URL predictions are displayed directly on the home page.
+
+Example:
+
+```text
+✓ Legitimate Website
+```
+
+or:
+
+```text
+⚠ Phishing Website Detected
+```
+
+CSV predictions are displayed on a separate result page containing prediction statistics and the detailed table.
+
+---
+
+# 🔌 API Endpoints
+
+## Home
 
 ```http
 GET /
 ```
 
-Displays the web interface for uploading prediction data.
+Displays the main prediction interface.
 
-### Prediction
+---
+
+## CSV Prediction
 
 ```http
 POST /predict
 ```
 
-Accepts a CSV file and performs phishing website prediction.
+Accepts a CSV file containing website features and performs batch phishing prediction.
 
-### Training
+---
+
+## URL Prediction
+
+```http
+POST /predict-url
+```
+
+Accepts a website URL.
+
+The endpoint:
+
+```text
+Validates URL
+      ↓
+Extracts 30 Features
+      ↓
+Loads NetworkModel
+      ↓
+Performs Prediction
+      ↓
+Returns Legitimate / Phishing
+```
+
+---
+
+## Training
 
 ```http
 GET /train
 ```
 
-Triggers the training pipeline.
+Triggers the complete training pipeline.
 
-> The training endpoint is intended primarily for development/testing and should be protected or redesigned before exposing it in a production environment.
+> This endpoint is primarily intended for development/testing. Authentication or another protection mechanism should be added before exposing model training in a production environment.
 
-### API Documentation
+---
 
-FastAPI automatically provides Swagger documentation at:
+## Swagger Documentation
+
+FastAPI automatically generates interactive API documentation at:
 
 ```text
-/docs
+http://127.0.0.1:8000/docs
 ```
 
 ---
 
-## 📁 Project Structure
+# 📁 Project Structure
 
 ```text
 NETWORK_SECURITY/
 │
 ├── app.py
 ├── main.py
+├── push_data.py
 ├── README.md
 ├── requirements.txt
 ├── setup.py
+├── .env
 ├── .gitignore
 │
-├── templates/
-│   ├── index.html
-│   └── table.html
+├── data_schema/
+│   └── schema.yaml
+│
+├── Network_Data/
+│   └── phisingData.csv
 │
 ├── final_model/
 │   ├── model.pkl
@@ -315,85 +595,101 @@ NETWORK_SECURITY/
 ├── prediction_output/
 │   └── output.csv
 │
-├── artifacts/
+├── templates/
+│   ├── index.html
+│   └── table.html
 │
-└── networksecurity/
-    │
-    ├── __init__.py
-    │
-    ├── components/
-    │   ├── data_ingestion.py
-    │   ├── data_validation.py
-    │   ├── data_transformation.py
-    │   └── model_trainer.py
-    │
-    ├── constants/
-    │   └── training_pipeline.py
-    │
-    ├── entity/
-    │   ├── artifact_entity.py
-    │   └── config_entity.py
-    │
-    ├── exception/
-    │   └── exception.py
-    │
-    ├── logging/
-    │   └── logger.py
-    │
-    ├── pipeline/
-    │   └── training_pipeline.py
-    │
-    ├── utils/
-    │   ├── main_utils/
-    │   └── ml_utils/
-    │
-    └── cloud/
+├── networksecurity/
+│   │
+│   ├── __init__.py
+│   │
+│   ├── components/
+│   │   ├── data_ingestion.py
+│   │   ├── data_validation.py
+│   │   ├── data_transformation.py
+│   │   └── model_trainer.py
+│   │
+│   ├── constants/
+│   │   └── training_pipeline/
+│   │
+│   ├── entity/
+│   │   ├── artifact_entity.py
+│   │   └── config_entity.py
+│   │
+│   ├── exception/
+│   │   └── exception.py
+│   │
+│   ├── logging/
+│   │   └── logger.py
+│   │
+│   ├── pipeline/
+│   │   ├── batch_pipeline.py
+│   │   └── training_pipeline.py
+│   │
+│   ├── utils/
+│   │   ├── main_utils/
+│   │   ├── ml_utils/
+│   │   └── url_utils/
+│   │       └── url_feature_extractor.py
+│   │
+│   └── cloud/
+│       └── s3_syncer.py
+│
+├── valid_data/
+│   └── test.csv
+│
+└── logs/
 ```
 
 ---
 
-## 🛠️ Technologies Used
+# 🛠️ Technologies Used
 
-### Programming
+## Programming
 
 - Python
 
-### Data Processing
+## Data Processing
 
 - NumPy
 - Pandas
 
-### Machine Learning
+## Machine Learning
 
 - Scikit-Learn
 - SciPy
 
-### Database
+## Database
 
 - MongoDB
 - PyMongo
 
-### Backend
+## Backend
 
 - FastAPI
 - Uvicorn
 
-### Frontend
+## Frontend
 
 - HTML
 - CSS
-- Jinja2 Templates
+- Jinja2
 
-### Model Serialization
+## URL & Web Analysis
 
-- Pickle
+- Requests
+- BeautifulSoup
+- python-whois
+- Socket
+- SSL
+- DNS resolution
 
-### Configuration
+## Configuration
 
 - YAML
 - python-dotenv
 
-### Development Tools
+## Development Tools
 
 - Git
 - GitHub
@@ -402,87 +698,58 @@ NETWORK_SECURITY/
 
 ---
 
-## 📋 Dataset Features
+# ⚙️ Installation
 
-The model analyzes multiple website and URL-related security characteristics, including:
-
-```text
-having_IP_Address
-URL_Length
-Shortining_Service
-having_At_Symbol
-double_slash_redirecting
-Prefix_Suffix
-having_Sub_Domain
-SSLfinal_State
-Domain_registeration_length
-Favicon
-port
-HTTPS_token
-Request_URL
-URL_of_Anchor
-Links_in_tags
-SFH
-Submitting_to_email
-Abnormal_URL
-Redirect
-on_mouseover
-RightClick
-popUpWidnow
-Iframe
-age_of_domain
-DNSRecord
-web_traffic
-Page_Rank
-Google_Index
-Links_pointing_to_page
-Statistical_report
-```
-
-The target variable used during training is:
-
-```text
-Result
-```
-
----
-
-## ⚙️ Installation
-
-### 1. Clone the Repository
+## 1. Clone Repository
 
 ```bash
 git clone <repository-url>
 cd NETWORK_SECURITY
 ```
 
-### 2. Create Virtual Environment
+---
 
-Windows:
+## 2. Create Virtual Environment
+
+### Windows
 
 ```bash
 python -m venv .venv
 .venv\Scripts\activate
 ```
 
-Linux/macOS:
+### Linux/macOS
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 ```
 
-### 3. Install Dependencies
+---
+
+## 3. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
+For URL prediction, make sure the required packages are installed:
+
+```bash
+pip install requests beautifulsoup4 python-whois python-multipart
+```
+
 ---
 
-## 🔐 Environment Variables
+# 🔐 Environment Variables
 
-Create a `.env` file in the project root.
+Create:
+
+```text
+.env
+```
+
+inside the project root.
 
 Example:
 
@@ -490,33 +757,35 @@ Example:
 MONGO_DB_URL=your_mongodb_connection_string
 ```
 
-Never commit the `.env` file to a public repository.
+Never commit credentials to GitHub.
 
-Add it to `.gitignore`:
+Your `.gitignore` should include:
 
 ```gitignore
 .env
+.venv/
+__pycache__/
+*.pyc
+logs/
 ```
 
 ---
 
-## ▶️ Running the Application
+# ▶️ Running the Application
 
-Start the FastAPI application using:
+Start FastAPI using:
 
 ```bash
 uvicorn app:app --reload
 ```
 
-The application will normally run at:
+The application normally runs at:
 
 ```text
 http://127.0.0.1:8000
 ```
 
-Open the address in your browser to access the prediction interface.
-
-Swagger API documentation is available at:
+Swagger documentation:
 
 ```text
 http://127.0.0.1:8000/docs
@@ -524,151 +793,206 @@ http://127.0.0.1:8000/docs
 
 ---
 
-## 🔍 Prediction Workflow
+# 🧪 URL Prediction Example
 
-The prediction workflow is:
-
-```text
-User Uploads CSV
-       ↓
-FastAPI receives file
-       ↓
-Pandas reads CSV
-       ↓
-Saved NetworkModel loaded
-       ↓
-Preprocessor transforms features
-       ↓
-ML classifier generates predictions
-       ↓
-Predictions converted to readable labels
-       ↓
-Prediction summary calculated
-       ↓
-Results saved
-       ↓
-HTML result page displayed
-```
-
----
-
-## 🧪 Example Usage
-
-1. Start the FastAPI server.
+Start the application:
 
 ```bash
 uvicorn app:app --reload
 ```
 
-2. Open the application in the browser.
+Open:
 
-3. Select a CSV file containing the required input features.
+```text
+http://127.0.0.1:8000
+```
 
-4. Click:
+Enter a URL such as:
+
+```text
+https://www.google.com
+```
+
+Click:
+
+```text
+Check Website
+```
+
+The system performs:
+
+```text
+URL
+ ↓
+Security Validation
+ ↓
+30 Feature Extraction
+ ↓
+Model Prediction
+ ↓
+Result
+```
+
+Example output:
+
+```text
+✓ Legitimate Website
+```
+
+---
+
+# 📂 CSV Prediction Example
+
+Open the application and choose:
+
+```text
+Upload Dataset
+```
+
+Select a CSV file containing the required input features.
+
+Click:
 
 ```text
 Analyze Dataset
 ```
 
-5. The system processes the uploaded records and displays the prediction results.
-
----
-
-## 🏗️ MLOps-Oriented Architecture
-
-The project was designed using a modular pipeline architecture rather than keeping all Machine Learning logic inside a single notebook.
+The application displays:
 
 ```text
-                    ┌──────────────────────┐
-                    │     Source Data      │
-                    └──────────┬───────────┘
-                               │
-                               ▼
-                    ┌──────────────────────┐
-                    │   Data Ingestion     │
-                    └──────────┬───────────┘
-                               │
-                               ▼
-                    ┌──────────────────────┐
-                    │   Data Validation    │
-                    │ + Drift Detection    │
-                    └──────────┬───────────┘
-                               │
-                               ▼
-                    ┌──────────────────────┐
-                    │ Data Transformation  │
-                    └──────────┬───────────┘
-                               │
-                               ▼
-                    ┌──────────────────────┐
-                    │    Model Trainer     │
-                    └──────────┬───────────┘
-                               │
-                               ▼
-                    ┌──────────────────────┐
-                    │     NetworkModel     │
-                    └──────────┬───────────┘
-                               │
-                               ▼
-                    ┌──────────────────────┐
-                    │       FastAPI        │
-                    └──────────┬───────────┘
-                               │
-                               ▼
-                    ┌──────────────────────┐
-                    │  Prediction Website  │
-                    └──────────────────────┘
+Total Records
+Legitimate Records
+Phishing Records
+Legitimate Percentage
+Phishing Percentage
+Detailed Prediction Table
 ```
 
 ---
 
-## 🔒 Security Considerations
+# 🏗️ System Architecture
 
-Sensitive credentials are managed through environment variables rather than being hard-coded into application source code.
+```text
+                         ┌──────────────────────┐
+                         │     Source Data      │
+                         │      MongoDB         │
+                         └──────────┬───────────┘
+                                    │
+                                    ▼
+                         ┌──────────────────────┐
+                         │   Data Ingestion     │
+                         └──────────┬───────────┘
+                                    │
+                                    ▼
+                         ┌──────────────────────┐
+                         │   Data Validation    │
+                         │ + Drift Detection    │
+                         └──────────┬───────────┘
+                                    │
+                                    ▼
+                         ┌──────────────────────┐
+                         │ Data Transformation  │
+                         └──────────┬───────────┘
+                                    │
+                                    ▼
+                         ┌──────────────────────┐
+                         │    Model Training    │
+                         │ + Model Selection    │
+                         └──────────┬───────────┘
+                                    │
+                                    ▼
+                         ┌──────────────────────┐
+                         │     NetworkModel     │
+                         └──────────┬───────────┘
+                                    │
+                                    ▼
+                         ┌──────────────────────┐
+                         │       FastAPI        │
+                         └──────────┬───────────┘
+                                    │
+                      ┌─────────────┴─────────────┐
+                      │                           │
+                      ▼                           ▼
+             ┌──────────────────┐       ┌──────────────────┐
+             │    CSV Upload    │       │   Website URL    │
+             │    Prediction    │       │    Prediction    │
+             └────────┬─────────┘       └────────┬─────────┘
+                      │                           │
+                      │                  ┌────────▼─────────┐
+                      │                  │ Feature Extractor│
+                      │                  │   30 Features    │
+                      │                  └────────┬─────────┘
+                      │                           │
+                      └─────────────┬─────────────┘
+                                    │
+                                    ▼
+                         ┌──────────────────────┐
+                         │ Legitimate/Phishing  │
+                         └──────────────────────┘
+```
 
-Files such as the following should not be committed:
+---
+
+# 🔒 Security Considerations
+
+Sensitive credentials are managed using environment variables rather than hard-coded values.
+
+Files such as:
 
 ```text
 .env
 .venv/
 __pycache__/
 logs/
-prediction_output/
 ```
 
-Credentials such as MongoDB passwords, cloud access keys, and API tokens must never be stored directly in the source code.
+should not be committed to a public repository.
+
+Credentials such as:
+
+- MongoDB passwords
+- Cloud credentials
+- API tokens
+- Access keys
+
+must never be stored directly in source code.
+
+The URL prediction endpoint also performs basic validation to prevent requests to private/local network resources.
 
 ---
 
-## 🚀 Future Improvements
+# 🚀 Future Improvements
 
-The current project can be extended with:
+The project can be extended with:
 
+- More accurate real-time URL feature extraction
+- External domain reputation APIs
+- Phishing blacklist integration
+- URL-mode validation on a labeled live dataset
+- Probability/confidence score
 - Docker containerization
 - CI/CD pipeline
 - Cloud deployment
-- AWS S3 model and artifact storage
+- AWS S3 artifact storage
 - MLflow experiment tracking
 - DagsHub integration
 - Model registry
-- Automated model retraining
+- Automated retraining
 - Production monitoring
-- Advanced data drift monitoring
 - Prediction logging
+- Advanced drift monitoring
 - Model versioning
 - Authentication for training endpoints
 - Improved frontend dashboard
-- Real-time single-URL phishing prediction
-
-These features can be integrated incrementally without changing the core Machine Learning architecture.
 
 ---
 
-## 📈 Current Project Status
+# 📈 Current Project Status
 
 | Component | Status |
 |---|---|
 | Data Ingestion | ✅ Completed |
+| MongoDB Integration | ✅ Completed |
 | Data Validation | ✅ Completed |
 | Schema Validation | ✅ Completed |
 | Data Drift Detection | ✅ Completed |
@@ -679,64 +1003,96 @@ These features can be integrated incrementally without changing the core Machine
 | Model Serialization | ✅ Completed |
 | FastAPI Backend | ✅ Completed |
 | CSV Prediction | ✅ Completed |
+| CSV Prediction Dashboard | ✅ Completed |
 | Web Interface | ✅ Completed |
-| MongoDB Integration | ✅ Completed |
+| URL Feature Extractor | ✅ Implemented |
+| Direct URL Prediction | 🧪 Experimental |
+| URL Security Validation | ✅ Implemented |
 | Docker | 🔜 Future Enhancement |
 | Cloud Deployment | 🔜 Future Enhancement |
 | CI/CD | 🔜 Future Enhancement |
+| Live URL Accuracy Validation | 🔜 Future Enhancement |
 
 ---
 
-## 🎓 Learning Outcomes
+# 🎓 Learning Outcomes
 
 This project demonstrates practical understanding of:
 
-- End-to-end Machine Learning project development
-- Modular Python project architecture
+- End-to-end Machine Learning development
+- Modular Python architecture
 - Classification algorithms
 - Hyperparameter optimization
-- Data preprocessing pipelines
+- Data preprocessing
+- KNN imputation
 - Statistical data drift detection
 - Model evaluation
 - Model serialization
 - MongoDB integration
 - FastAPI development
 - REST API concepts
-- HTML/Jinja2 integration
+- HTML and Jinja2 integration
+- URL feature engineering
+- HTML parsing
+- WHOIS lookup
+- DNS and SSL analysis
 - Environment variable management
+- Basic API security
 - ML model serving
+- MLOps-oriented project architecture
 
 ---
 
-## 👨‍💻 Author
+# 👨‍💻 Author
 
 **Amrit Raj**
 
 M.Tech — Robotics & Artificial Intelligence  
 Indian Institute of Technology Bhubaneswar
 
-Areas of Interest:
+### Areas of Interest
 
 - Machine Learning
 - Artificial Intelligence
 - Robotics
 - Computer Vision
+- Generative AI
 - MLOps
 
 ---
 
-## 📄 License
+# 📄 License
 
-This project is developed for educational, research, and portfolio purposes.
+This project is developed for educational, research, demonstration, and portfolio purposes.
 
 ---
 
-## ⭐ Project Summary
+# ⭐ Project Summary
 
-The **Network Security Detection System** demonstrates how a Machine Learning model can be developed beyond a notebook and organized into a complete application.
+The **Network Security Detection System** demonstrates how a Machine Learning model can be developed beyond a notebook and converted into a modular, end-to-end application.
 
-It combines:
+The project combines:
 
-**Data Engineering + Data Validation + Machine Learning + MLOps Architecture + API Development + Web-Based Model Serving**
+```text
+Data Engineering
+      +
+Data Validation
+      +
+Data Drift Detection
+      +
+Machine Learning
+      +
+Hyperparameter Tuning
+      +
+MongoDB
+      +
+FastAPI
+      +
+URL Feature Engineering
+      +
+Web-Based Model Serving
+```
 
-to provide an end-to-end phishing website detection system.
+to build a complete phishing website detection system.
+
+The validated ML pipeline supports batch prediction from structured CSV data, while the project additionally explores **direct website URL analysis** through automatic extraction of 30 phishing-related security features.
